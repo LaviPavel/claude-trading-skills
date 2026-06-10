@@ -6,12 +6,10 @@ Retrieves upcoming earnings announcements from Financial Modeling Prep API,
 filters by market cap (>$2B), and outputs structured JSON data.
 
 Usage:
-    # With environment variable
+    # API key via environment variable (only supported method —
+    # argv would leak the key into process listings / shell history)
     export FMP_API_KEY="your-key"
     python fetch_earnings_fmp.py 2025-11-03 2025-11-09
-
-    # With API key as argument
-    python fetch_earnings_fmp.py 2025-11-03 2025-11-09 YOUR_API_KEY
 
     # Help
     python fetch_earnings_fmp.py --help
@@ -302,18 +300,13 @@ class FMPEarningsCalendar:
 
 def get_api_key() -> Optional[str]:
     """
-    Get API key from environment or command line
+    Get API key from environment
 
     Returns:
         API key or None
     """
-    # Method 1: Command line argument (position 3)
-    if len(sys.argv) >= 4:
-        api_key = sys.argv[3]
-        print("✓ API key provided via command line argument", file=sys.stderr)
-        return api_key
-
-    # Method 2: Environment variable
+    # Environment variable only — argv would leak the key into
+    # process listings and shell history
     api_key = os.environ.get("FMP_API_KEY")
     if api_key:
         print("✓ API key loaded from FMP_API_KEY environment variable", file=sys.stderr)
@@ -324,9 +317,8 @@ def get_api_key() -> Optional[str]:
     print("", file=sys.stderr)
     print("Options:", file=sys.stderr)
     print("1. Set environment variable: export FMP_API_KEY='your-key'", file=sys.stderr)
-    print("2. Pass as argument: python fetch_earnings_fmp.py START END YOUR_KEY", file=sys.stderr)
     print(
-        "3. Get free API key: https://site.financialmodelingprep.com/developer/docs",
+        "2. Get free API key: https://site.financialmodelingprep.com/developer/docs",
         file=sys.stderr,
     )
     return None
@@ -352,18 +344,17 @@ def validate_date(date_str: str) -> bool:
 def print_usage():
     """Print usage instructions"""
     print("Usage:", file=sys.stderr)
-    print("  python fetch_earnings_fmp.py START_DATE END_DATE [API_KEY]", file=sys.stderr)
+    print("  python fetch_earnings_fmp.py START_DATE END_DATE", file=sys.stderr)
     print("", file=sys.stderr)
     print("Arguments:", file=sys.stderr)
     print("  START_DATE  Start date in YYYY-MM-DD format", file=sys.stderr)
     print("  END_DATE    End date in YYYY-MM-DD format", file=sys.stderr)
-    print("  API_KEY     (Optional) FMP API key (or use FMP_API_KEY env var)", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("API key: set the FMP_API_KEY environment variable", file=sys.stderr)
     print("", file=sys.stderr)
     print("Examples:", file=sys.stderr)
     print("  export FMP_API_KEY='your-key'", file=sys.stderr)
     print("  python fetch_earnings_fmp.py 2025-11-03 2025-11-09", file=sys.stderr)
-    print("", file=sys.stderr)
-    print("  python fetch_earnings_fmp.py 2025-11-03 2025-11-09 your-key", file=sys.stderr)
     print("", file=sys.stderr)
     print("Output:", file=sys.stderr)
     print("  JSON data is written to stdout", file=sys.stderr)
